@@ -20,10 +20,14 @@ INCLUDE_DIRS = \
 CFILES = \
 	app.c \
 	strobe.c \
+	ui.c \
 	$(LIBS_DIR)/AVR/lib_clk.c \
 	$(LIBS_DIR)/AVR/lib_fuses.c \
+	$(LIBS_DIR)/AVR/lib_io.c \
 	$(LIBS_DIR)/AVR/lib_tmr8.c \
 	$(LIBS_DIR)/AVR/lib_tmr8_tick.c \
+	$(LIBS_DIR)/AVR/lib_encoder.c \
+	$(LIBS_DIR)/Generics/button.c \
 	$(LIBS_DIR)/Generics/memorypool.c
 	
 OPTS = \
@@ -31,7 +35,8 @@ OPTS = \
 	-Wall \
 	-Wextra \
 	-DF_CPU=16000000 \
-	-DMEMORY_POOL_BYTES=512
+	-DMEMORY_POOL_BYTES=512 \
+	-DENCODER_PCINT0
 	
 LDFLAGS = \
 	-Wl
