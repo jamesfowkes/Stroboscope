@@ -49,7 +49,8 @@
  * AVR Library Includes
  */
 
-//None
+#include "lib_clk.h"
+#include "lib_tmr8_tick.h"
 
 /*
  * Local Application Includes
@@ -103,7 +104,6 @@ int main(void)
 
 		if (TMR8_Tick_TestAndClear(&heartbeatTick))
 		{
-			s_BlinkState = !s_BlinkState;
 		}
 	}
 
