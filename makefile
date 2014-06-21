@@ -1,12 +1,10 @@
 NAME=stroboscope
 
-AVR_DIR=$(AVR32_HOME)/bin
-
-CC=$(AVR_DIR)/avr-gcc
+CC=avr-gcc
 MCU_TARGET=atmega328p
-LIBS_DIR = $(PROJECTS_PATH)\Libs
+LIBS_DIR = $(PROJECTS_PATH)/Libs
 
-DEL = python $(LIBS_DIR)\del.py
+DEL = python $(LIBS_DIR)/del.py
 
 OPT_LEVEL=3
 
@@ -38,8 +36,7 @@ OPTS = \
 	-DMEMORY_POOL_BYTES=512 \
 	-DENCODER_PCINT0
 	
-LDFLAGS = \
-	-Wl
+LDFLAGS =
 
 OBJDEPS=$(CFILES:.c=.o)
 
