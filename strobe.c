@@ -19,31 +19,30 @@
 /*
  * Defines and Typedefs
  */
-#define MAX_FREQ 5000U
-#define MIN_FREQ 5U
 
 /*
  * Local Variables
  */
  
-// Start at minimum frequency, 50% duty
-STROBESETTINGS s_settings = {MIN_FREQ, 50U};
+// Start at default frequency, 50% duty
+STROBESETTINGS s_settings = {DEFAULT_FREQ, DEFAULT_RPM, 50U};
 
 /*
  * Private Function Declarations
  */
 
-static const STROBESETTINGS * setNewFreq(uint16_t freq);
+static const STROBESETTINGS * setNewFreq(MILLIHERTZ freq);
 
 /*
  * Public Function Definitions
  */
 
- /* GetDuty, GetFrequency
- :Accessor functions for duty and frequency
+ /* GetDuty, GetFrequency, GetRPM
+ :Accessor functions for current duty, frequency and RPM
 */
 uint8_t GetDuty(void) { return s_settings.duty; }
-uint16_t GetFrequency(void) { return s_settings.frequency; }
+MILLIHERTZ GetFrequency(void) { return s_settings.frequency; }
+uint16_t GetRPM(void) { return s_settings.rpm; }
 
 /* HalfFrequency, ThirdFrequency, DoubleFrequency, TrebleFrequency, SetFrequency, AlterFrequency
  :All these functions pass a frequency to the private set function and return a pointer to the private data.
@@ -53,8 +52,12 @@ const STROBESETTINGS * HalfFrequency(void) { return setNewFreq( div_round_pos(s_
 const STROBESETTINGS * ThirdFrequency(void) { return setNewFreq( div_round_pos(s_settings.frequency, 3) ); }
 const STROBESETTINGS * DoubleFrequency(void) { return setNewFreq(s_settings.frequency * 2); }
 const STROBESETTINGS * TrebleFrequency(void) { return setNewFreq(s_settings.frequency * 3); }
-const STROBESETTINGS * SetFrequency(uint16_t new) { return setNewFreq(new); }
-const STROBESETTINGS * AlterFrequency(int16_t change) { return setNewFreq(s_settings.frequency + change); }
+
+const STROBESETTINGS * SetFrequency(MILLIHERTZ new) { return setNewFreq(new); }
+const STROBESETTINGS * AlterFrequency(MILLIHERTZ change) { return setNewFreq(s_settings.frequency + change); }
+
+const STROBESETTINGS * SetRPM(uint16_t new) { return setNewFreq(RPM_TO_MILLIHZ(new)); }
+const STROBESETTINGS * AlterRPM(int16_t change) { return setNewFreq(RPM_TO_MILLIHZ(s_settings.rpm + change)); }
 
 /* SetDuty
  :If in range, immediately sets a new strobe duty cycle
@@ -65,6 +68,14 @@ const STROBESETTINGS * SetDuty(uint8_t duty)
 	return &s_settings;
 }
 
+/* AlterDuty
+ :Changes the current strobe duty cycle by specified amount
+*/
+const STROBESETTINGS * AlterDuty(int16_t duty)
+{
+	return SetDuty(s_settings.duty + duty);
+}
+
 /*
  * Private Function Definitions
  */
@@ -72,11 +83,12 @@ const STROBESETTINGS * SetDuty(uint8_t duty)
 /* setNewFreq
  :If in range, immediately sets a new strobe frequency
 */
-static const STROBESETTINGS * setNewFreq(uint16_t freq)
+static const STROBESETTINGS * setNewFreq(MILLIHERTZ freq)
 {
 	if ((freq <= MAX_FREQ) && (freq >= MIN_FREQ))
 	{
 		s_settings.frequency = freq;
+		s_settings.rpm = MILLIHZ_TO_RPM(freq);
 	}
 	return (const STROBESETTINGS *)&s_settings;
 }

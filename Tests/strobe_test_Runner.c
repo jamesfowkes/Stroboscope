@@ -36,6 +36,11 @@ extern void testDoubleFrequencyIsCorrect(void);
 extern void testTrebleFrequencyIsCorrect(void);
 extern void testAlterFrequencyIsCorrect(void);
 extern void testSetDutyIsCorrect(void);
+extern void testAlterDutyIsCorrect(void);
+extern void testSetRPMIsCorrect(void);
+extern void testAlterRPMIsCorrect(void);
+extern void testRPMFollowsFrequency(void);
+extern void testFrequencyFollowsRPM(void);
 
 //=======Test Reset Option=====
 void resetTest()
@@ -60,5 +65,11 @@ int main(void)
   RUN_TEST(testTrebleFrequencyIsCorrect, 7);
   RUN_TEST(testAlterFrequencyIsCorrect, 8);
   RUN_TEST(testSetDutyIsCorrect, 9);
+  RUN_TEST(testAlterDutyIsCorrect, 10);
+  RUN_TEST(testSetRPMIsCorrect, 11);
+  RUN_TEST(testAlterRPMIsCorrect, 12);
+  RUN_TEST(testRPMFollowsFrequency, 13);
+  RUN_TEST(testFrequencyFollowsRPM, 14);
+  
   return (UnityEnd());
 }
