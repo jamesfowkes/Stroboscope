@@ -37,7 +37,7 @@ static const STROBESETTINGS * setNewFreq(MILLIHERTZ freq);
  * Public Function Definitions
  */
 
- /* GetDuty, GetFrequency, GetRPM
+/* GetDuty, GetFrequency, GetRPM
  :Accessor functions for current duty, frequency and RPM
 */
 uint8_t GetDuty(void) { return s_settings.duty; }
@@ -54,7 +54,7 @@ const STROBESETTINGS * DoubleFrequency(void) { return setNewFreq(s_settings.freq
 const STROBESETTINGS * TrebleFrequency(void) { return setNewFreq(s_settings.frequency * 3); }
 
 const STROBESETTINGS * SetFrequency(MILLIHERTZ new) { return setNewFreq(new); }
-const STROBESETTINGS * AlterFrequency(MILLIHERTZ change) { return setNewFreq(s_settings.frequency + change); }
+const STROBESETTINGS * AlterFrequency(MILLIHERTZ change) { return setNewFreq(s_settings.frequency + (change * 10)); }
 
 const STROBESETTINGS * SetRPM(uint16_t new) { return setNewFreq(RPM_TO_MILLIHZ(new)); }
 const STROBESETTINGS * AlterRPM(int16_t change) { return setNewFreq(RPM_TO_MILLIHZ(s_settings.rpm + change)); }

@@ -58,8 +58,9 @@
  * Local Application Includes
  */
 
-#include "app.h"
+#include "ui.h"
 #include "strobe.h"
+#include "app.h"
 
 /*
  * Private Defines and Datatypes
@@ -86,7 +87,8 @@ static void handleEncoderChange(int16_t change);
 static TMR8_TICK_CONFIG appTick;
 static TMR8_TICK_CONFIG heartbeatTick;
 
-static bool s_bFrequencySettingChanged = false;
+static bool s_bSettingsChanged = false;
+static STROBESETTINGS const * s_settings;
 
 int main(void)
 {
@@ -106,6 +108,8 @@ int main(void)
 
 	while (true)
 	{
+		UI_Tick();
+		
 		if (TMR8_Tick_TestAndClear(&appTick))
 		{
 			applicationTick();
@@ -122,16 +126,19 @@ int main(void)
 /*
  * Private Functions
  */
+ 
+/* setupTimer, setupIO
+ : Once-only setup functions
+*/
 static void setupIO(void)
 {
-	// TODO: Change to actual encoder inputs
-	ENC_Setup(IO_PORTB, 0, 1);
+
 }
 
 static void setupTimer(void)
 {
 	CLK_Init(0);
-	TMR8_Tick_Init(2, 0);
+	TMR8_Tick_Init(3, 0);
 	
 	appTick.reload = APP_TICK_MS;
 	appTick.active = true;
@@ -142,41 +149,64 @@ static void setupTimer(void)
 	TMR8_Tick_AddTimerConfig(&heartbeatTick);
 }
 
+/* applicationTick
+ : Handles change of encoder by polling and sending to either 
+ : UI (for display) or strobe (for parameter s_settings)
+*/
 static void applicationTick(void)
 {
 	int encoderChange = ENC_GetMovement();
 	
 	if (!UI_EncoderButtonIsPressed())
 	{
-		// Encoder is controlling frequency or duty
+		// Encoder is controlling rpm/frequency or duty
 		handleEncoderChange(encoderChange);
 	}
 	else
 	{
+		// Encoder is moving cursor on display
 		UI_HandleEncoderChange(encoderChange);
 	}
 	
-	if (s_bFrequencySettingChanged)
+	if (s_bSettingsChanged)
 	{
-		//TODO: Update Display (do both freq and duty, simpler code that way)
+		s_bSettingsChanged = false;
+		UI_UpdateDisplay((s_settings->frequency + 5) / 10, s_settings->duty, s_settings->rpm);
 	}
 }
 
+/* handleEncoderChange
+ : Converts encoder movement to change in strobe paramter value.
+ : Passes that change in value to the strobe module.
+ : The change of duty/frequency/rpm is the place value of the digit multipled by the encoder movement.
+*/
 static void handleEncoderChange(int16_t change)
 {
-	(void)change;
+	uint16_t multipliers[] = {1, 10, 100, 1000};
+	
+	change *= multipliers[ UI_SelectedDigit() ];
+	
 	switch (UI_SelectedLine())
 	{
+	case RPM:
+		s_settings = AlterRPM(change);
+		break;
 	case FREQ:
-		//TODO: handle change
+		s_settings = AlterFrequency(change);
 		break;
 	case DUTY:
-		//TODO: handle change
+		s_settings = AlterDuty(change);
 		break;
 	}
+	
+	s_bSettingsChanged = true;
 }
 
-void APP_HalfFreq() { HalfFrequency(); }
-void APP_ThirdFreq() { ThirdFrequency(); }
-void APP_DoubleFreq() { DoubleFrequency(); }
-void APP_TrebleFreq() { TrebleFrequency(); }
+/* APP_HalfFreq, APP_ThirdFreq, APP_DoubleFreq, APP_TrebleFreq
+ : Callbacks from the ui module for the half, third, double, treble buttons
+ : Redirects straight to strobe module
+*/
+void APP_HalfFreq() { s_settings = HalfFrequency(); s_bSettingsChanged = true;}
+void APP_ThirdFreq() { s_settings = ThirdFrequency(); s_bSettingsChanged = true;}
+void APP_DoubleFreq() { s_settings = DoubleFrequency(); s_bSettingsChanged = true;}
+void APP_TrebleFreq() { s_settings = TrebleFrequency(); s_bSettingsChanged = true;}
