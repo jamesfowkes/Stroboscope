@@ -34,6 +34,13 @@
 #include <avr/eeprom.h>
 
 /*
+ * Utility Library Includes
+ */
+
+#include "util_macros.h"
+#include "util_units.h"
+
+/*
  * Device Includes
  */
 
@@ -50,8 +57,9 @@
  */
 
 #include "lib_clk.h"
-#include "lib_tmr8_tick.h"
 #include "lib_io.h"
+#include "lib_tmr8_tick.h"
+#include "lib_tmr16_pwm.h"
 #include "lib_encoder.h"
 
 /*
@@ -132,7 +140,8 @@ int main(void)
 */
 static void setupIO(void)
 {
-
+	// TODO: Set output compare A to output 
+	IO_SetMode(IO_PORTB, 5, IO_MODE_OUTPUT);
 }
 
 static void setupTimer(void)
@@ -172,6 +181,8 @@ static void applicationTick(void)
 	{
 		s_bSettingsChanged = false;
 		UI_UpdateDisplay((s_settings->frequency + 5) / 10, s_settings->duty, s_settings->rpm);
+		
+		TMR16_PWM_Set(s_settings->frequency, s_settings->duty, TMR_OCCHAN_A);
 	}
 }
 
@@ -189,13 +200,13 @@ static void handleEncoderChange(int16_t change)
 	switch (UI_SelectedLine())
 	{
 	case RPM:
-		s_settings = AlterRPM(change);
+		s_settings = AlterRPM(change); // Each encoder tick is change of 1RPM
 		break;
 	case FREQ:
-		s_settings = AlterFrequency(change);
+		s_settings = AlterFrequency(change * 10); // Each encoder tick is change of 10mHz
 		break;
 	case DUTY:
-		s_settings = AlterDuty(change);
+		s_settings = AlterDuty(change); // Each encoder tick is change of 1%
 		break;
 	}
 	

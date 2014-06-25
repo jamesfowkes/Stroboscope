@@ -8,7 +8,7 @@
  */
 
 #include "util_macros.h"
-
+#include "util_units.h"
 
 /*
  * Application Includes
@@ -31,7 +31,7 @@ STROBESETTINGS s_settings = {DEFAULT_FREQ, DEFAULT_RPM, 50U};
  * Private Function Declarations
  */
 
-static const STROBESETTINGS * setNewFreq(MILLIHERTZ freq);
+static const STROBESETTINGS * setNewFreq(MILLIHZ freq);
 
 /*
  * Public Function Definitions
@@ -41,7 +41,7 @@ static const STROBESETTINGS * setNewFreq(MILLIHERTZ freq);
  :Accessor functions for current duty, frequency and RPM
 */
 uint8_t GetDuty(void) { return s_settings.duty; }
-MILLIHERTZ GetFrequency(void) { return s_settings.frequency; }
+MILLIHZ GetFrequency(void) { return s_settings.frequency; }
 uint16_t GetRPM(void) { return s_settings.rpm; }
 
 /* HalfFrequency, ThirdFrequency, DoubleFrequency, TrebleFrequency, SetFrequency, AlterFrequency
@@ -53,8 +53,8 @@ const STROBESETTINGS * ThirdFrequency(void) { return setNewFreq( div_round_pos(s
 const STROBESETTINGS * DoubleFrequency(void) { return setNewFreq(s_settings.frequency * 2); }
 const STROBESETTINGS * TrebleFrequency(void) { return setNewFreq(s_settings.frequency * 3); }
 
-const STROBESETTINGS * SetFrequency(MILLIHERTZ new) { return setNewFreq(new); }
-const STROBESETTINGS * AlterFrequency(MILLIHERTZ change) { return setNewFreq(s_settings.frequency + (change * 10)); }
+const STROBESETTINGS * SetFrequency(MILLIHZ new) { return setNewFreq(new); }
+const STROBESETTINGS * AlterFrequency(MILLIHZ change) { return setNewFreq(s_settings.frequency + change); }
 
 const STROBESETTINGS * SetRPM(uint16_t new) { return setNewFreq(RPM_TO_MILLIHZ(new)); }
 const STROBESETTINGS * AlterRPM(int16_t change) { return setNewFreq(RPM_TO_MILLIHZ(s_settings.rpm + change)); }
@@ -83,7 +83,7 @@ const STROBESETTINGS * AlterDuty(int16_t duty)
 /* setNewFreq
  :If in range, immediately sets a new strobe frequency
 */
-static const STROBESETTINGS * setNewFreq(MILLIHERTZ freq)
+static const STROBESETTINGS * setNewFreq(MILLIHZ freq)
 {
 	if ((freq <= MAX_FREQ) && (freq >= MIN_FREQ))
 	{

@@ -5,8 +5,6 @@
  * Defines and Typedefs
  */
 
-typedef uint32_t MILLIHERTZ;
-
 #define MILLIHZ_TO_RPM(f) ((((f) * 60U) + 500U) / 1000U)
 #define RPM_TO_MILLIHZ(rpm) ((((rpm) * 1000U) + 30U) / 60U)
 
@@ -23,7 +21,7 @@ typedef uint32_t MILLIHERTZ;
 
 struct strobesettings
 {
-	MILLIHERTZ frequency;
+	MILLIHZ frequency;
 	uint16_t rpm;
 	uint8_t duty;
 };
@@ -34,7 +32,7 @@ typedef struct strobesettings STROBESETTINGS;
  */
 
 uint8_t GetDuty(void);
-MILLIHERTZ GetFrequency(void);
+MILLIHZ GetFrequency(void);
 uint16_t GetRPM(void);
 
 const STROBESETTINGS * HalfFrequency(void);
@@ -42,8 +40,8 @@ const STROBESETTINGS * ThirdFrequency(void);
 const STROBESETTINGS * DoubleFrequency(void);
 const STROBESETTINGS * TrebleFrequency(void);
 
-const STROBESETTINGS * SetFrequency(MILLIHERTZ freq);
-const STROBESETTINGS * AlterFrequency(MILLIHERTZ change);
+const STROBESETTINGS * SetFrequency(MILLIHZ freq);
+const STROBESETTINGS * AlterFrequency(MILLIHZ change);
 
 const STROBESETTINGS * SetRPM(uint16_t rpm);
 const STROBESETTINGS * AlterRPM(int16_t change);
