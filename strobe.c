@@ -44,6 +44,8 @@ uint8_t GetDuty(void) { return s_settings.duty; }
 MILLIHZ GetFrequency(void) { return s_settings.frequency; }
 uint16_t GetRPM(void) { return s_settings.rpm; }
 
+const STROBESETTINGS * GetSettings(void) { return &s_settings; }
+
 /* HalfFrequency, ThirdFrequency, DoubleFrequency, TrebleFrequency, SetFrequency, AlterFrequency
  :All these functions pass a frequency to the private set function and return a pointer to the private data.
 */

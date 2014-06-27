@@ -7,6 +7,12 @@
 #include <stdlib.h>
 
 /*
+ * AVR Includes (Defines and Primitives)
+ */
+
+#include <avr/io.h>
+
+/*
  * Device Library Includes
  */
  

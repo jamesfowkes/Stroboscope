@@ -35,6 +35,8 @@ uint8_t GetDuty(void);
 MILLIHZ GetFrequency(void);
 uint16_t GetRPM(void);
 
+const STROBESETTINGS * GetSettings(void);
+
 const STROBESETTINGS * HalfFrequency(void);
 const STROBESETTINGS * ThirdFrequency(void);
 const STROBESETTINGS * DoubleFrequency(void);

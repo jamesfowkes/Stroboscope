@@ -16,12 +16,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdint.h>
-
-/*
- * Utility Includes
- */
-
-#include "util_macros.h"
+#include <stdio.h>
 
 /*
  * AVR Includes (Defines and Primitives)
@@ -69,6 +64,7 @@
 #include "ui.h"
 #include "strobe.h"
 #include "app.h"
+#include "app_test_harness.h"
 
 /*
  * Private Defines and Datatypes
@@ -87,6 +83,7 @@ static void setupIO(void);
 static void applicationTick(void);
 
 static void handleEncoderChange(int16_t change);
+static inline void SetStrobe(void);
 
 /*
  * Private Variables
@@ -112,10 +109,14 @@ int main(void)
 
 	/* All processing interrupt based from here*/
 
+	DO_TEST_HARNESS_SETUP();
+	
 	sei();
 
 	while (true)
 	{
+		DO_TEST_HARNESS_RUNNING();
+		
 		UI_Tick();
 		
 		if (TMR8_Tick_TestAndClear(&appTick))
@@ -125,11 +126,22 @@ int main(void)
 
 		if (TMR8_Tick_TestAndClear(&heartbeatTick))
 		{
+			DO_TEST_HARNESS_TICK();
 		}
+
 	}
 
 	return 0;
 }
+
+/* APP_HalfFreq, APP_ThirdFreq, APP_DoubleFreq, APP_TrebleFreq
+ : Callbacks from the ui module for the half, third, double, treble buttons
+ : Redirects straight to strobe module
+*/
+void APP_HalfFreq() { s_settings = HalfFrequency(); s_bSettingsChanged = true;}
+void APP_ThirdFreq() { s_settings = ThirdFrequency(); s_bSettingsChanged = true;}
+void APP_DoubleFreq() { s_settings = DoubleFrequency(); s_bSettingsChanged = true;}
+void APP_TrebleFreq() { s_settings = TrebleFrequency(); s_bSettingsChanged = true;}
 
 /*
  * Private Functions
@@ -156,11 +168,14 @@ static void setupTimer(void)
 	heartbeatTick.reload = BLINK_TICK_MS;
 	heartbeatTick.active = true;
 	TMR8_Tick_AddTimerConfig(&heartbeatTick);
+	
+	s_settings = GetSettings();
+	SetStrobe();
 }
 
 /* applicationTick
  : Handles change of encoder by polling and sending to either 
- : UI (for display) or strobe (for parameter s_settings)
+ : UI (for display) or strobe (for parameter settings)
 */
 static void applicationTick(void)
 {
@@ -181,8 +196,7 @@ static void applicationTick(void)
 	{
 		s_bSettingsChanged = false;
 		UI_UpdateDisplay((s_settings->frequency + 5) / 10, s_settings->duty, s_settings->rpm);
-		
-		TMR16_PWM_Set(s_settings->frequency, s_settings->duty, TMR_OCCHAN_A);
+		SetStrobe();
 	}
 }
 
@@ -213,11 +227,11 @@ static void handleEncoderChange(int16_t change)
 	s_bSettingsChanged = true;
 }
 
-/* APP_HalfFreq, APP_ThirdFreq, APP_DoubleFreq, APP_TrebleFreq
- : Callbacks from the ui module for the half, third, double, treble buttons
- : Redirects straight to strobe module
-*/
-void APP_HalfFreq() { s_settings = HalfFrequency(); s_bSettingsChanged = true;}
-void APP_ThirdFreq() { s_settings = ThirdFrequency(); s_bSettingsChanged = true;}
-void APP_DoubleFreq() { s_settings = DoubleFrequency(); s_bSettingsChanged = true;}
-void APP_TrebleFreq() { s_settings = TrebleFrequency(); s_bSettingsChanged = true;}
+static inline void SetStrobe(void)
+{
+	#ifndef TEST_HARNESS
+	TMR16_PWM_Set(s_settings->frequency, s_settings->duty, TMR_OCCHAN_A);
+	#else
+	TMR16_PWM_Set(s_settings->frequency, s_settings->duty, TMR_OCCHAN_A, TEST_HARNESS_TMR16_DEBUG_PTR());
+	#endif
+}
