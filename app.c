@@ -122,13 +122,13 @@ int main(void)
 		if (TMR8_Tick_TestAndClear(&appTick))
 		{
 			applicationTick();
+			DO_TEST_HARNESS_TICK();
 		}
 
 		if (TMR8_Tick_TestAndClear(&heartbeatTick))
 		{
-			DO_TEST_HARNESS_TICK();
+			
 		}
-
 	}
 
 	return 0;

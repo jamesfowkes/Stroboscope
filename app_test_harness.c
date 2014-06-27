@@ -40,12 +40,16 @@
  */
 
 #include "app_test_harness.h"
+#include "ui.h"
+#include "strobe.h"
 
 /*
  * Local Test Functions
  */
 
+DECLARE_TEST_FUNCS(ApplicationDefaultsAreSet);
 DECLARE_TEST_FUNCS(IncreaseEncoderByOneWithSwitchOpen);
+DECLARE_TEST_FUNCS(IncreaseEncoderByTenWithSwitchOpen);
 
 /*
  * Local Test Variables
@@ -55,7 +59,9 @@ static TMR16_PWM_DEBUG pwmDebug;
 
 DECLARE_TEST_GROUP(ApplicationTests)
 {
-	TEST_STRUCT(IncreaseEncoderByOneWithSwitchOpen)
+	TEST_STRUCT(ApplicationDefaultsAreSet),
+	TEST_STRUCT(IncreaseEncoderByOneWithSwitchOpen),
+	TEST_STRUCT(IncreaseEncoderByTenWithSwitchOpen)
 };
 END_TEST_GROUP(ApplicationTests);
 
@@ -63,15 +69,25 @@ END_TEST_GROUP(ApplicationTests);
 **
 */
 
-DECLARE_TEST_FUNC(IncreaseEncoderByOneWithSwitchOpen)
+DECLARE_TEST_FUNC(ApplicationDefaultsAreSet)
 {
-
+	// Nothing to set up
 }
 
-DECLARE_RESULT_FUNC(IncreaseEncoderByOneWithSwitchOpen)
+DECLARE_RESULT_FUNC(ApplicationDefaultsAreSet)
 {
-	return false;
+	TEST_ASSERT_EQUAL(UI_SelectedLine(), RPM );
+	TEST_ASSERT_EQUAL(UI_SelectedDigit(), 0 );
+	TEST_ASSERT_EQUAL(GetDuty(), 50);
+	TEST_ASSERT_EQUAL(GetFrequency(), 16667 );
+	TEST_ASSERT_EQUAL(GetRPM(), 1000 );
 }
+
+DECLARE_TEST_FUNC(IncreaseEncoderByOneWithSwitchOpen) { ENC_SetMovement(1); }
+DECLARE_RESULT_FUNC(IncreaseEncoderByOneWithSwitchOpen) { TEST_ASSERT_EQUAL(GetRPM(), 1001 ); }
+
+DECLARE_TEST_FUNC(IncreaseEncoderByTenWithSwitchOpen) {	ENC_SetMovement(10); }
+DECLARE_RESULT_FUNC(IncreaseEncoderByTenWithSwitchOpen) { TEST_ASSERT_EQUAL(GetRPM(), 1011 ); }
 
 void DO_TEST_HARNESS_SETUP(void)
 {
@@ -80,7 +96,7 @@ void DO_TEST_HARNESS_SETUP(void)
 
 void DO_TEST_HARNESS_RUNNING(void)
 {
-	TMR8_Tick_Kick(50);
+	TMR8_Tick_Kick(5);
 }
 
 void DO_TEST_HARNESS_TICK(void)
