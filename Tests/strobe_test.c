@@ -4,6 +4,7 @@
 
 #include "unity.h"
 
+#include "util_units.h"
 #include "strobe.h"
 
 void setUp(void) {};
@@ -42,7 +43,7 @@ void testHalfFrequencyDivisionIsCorrect(void)
 {
 	const STROBESETTINGS * rtn;
 	
-	MILLIHERTZ expected = (MAX_FREQ+1)/2;
+	MILLIHZ expected = (MAX_FREQ+1)/2;
 	SetFrequency(MAX_FREQ);
 	
 	while (expected > MIN_FREQ)
@@ -57,7 +58,7 @@ void testThirdFrequencyDivisionIsCorrect(void)
 {
 	const STROBESETTINGS * rtn;
 	
-	MILLIHERTZ expected = ((MAX_FREQ*2) + 3) / 6;
+	MILLIHZ expected = ((MAX_FREQ*2) + 3) / 6;
 	SetFrequency(MAX_FREQ);
 	
 	while (expected > MIN_FREQ)
@@ -72,7 +73,7 @@ void testDoubleFrequencyIsCorrect(void)
 {
 	const STROBESETTINGS * rtn;
 	
-	MILLIHERTZ expected = MIN_FREQ * 2;
+	MILLIHZ expected = MIN_FREQ * 2;
 	SetFrequency(MIN_FREQ);
 	
 	while (expected < MAX_FREQ)
@@ -87,7 +88,7 @@ void testTrebleFrequencyIsCorrect(void)
 {
 	const STROBESETTINGS * rtn;
 	
-	MILLIHERTZ expected = MIN_FREQ * 3;
+	MILLIHZ expected = MIN_FREQ * 3;
 	SetFrequency(MIN_FREQ);
 	
 	while (expected < MAX_FREQ)
@@ -102,7 +103,7 @@ void testAlterFrequencyIsCorrect(void)
 {
 	const STROBESETTINGS * rtn;
 	SetFrequency(MIN_FREQ);
-	MILLIHERTZ expected = MIN_FREQ;
+	MILLIHZ expected = MIN_FREQ;
 	
 	rtn = AlterFrequency(100);
 	TEST_ASSERT_EQUAL(expected += 100, rtn->frequency);

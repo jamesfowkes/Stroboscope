@@ -32,6 +32,7 @@ STROBESETTINGS s_settings = {DEFAULT_FREQ, DEFAULT_RPM, 50U};
  */
 
 static const STROBESETTINGS * setNewFreq(MILLIHZ freq);
+static const STROBESETTINGS * setNewRpm(uint16_t rpm);
 
 /*
  * Public Function Definitions
@@ -58,8 +59,8 @@ const STROBESETTINGS * TrebleFrequency(void) { return setNewFreq(s_settings.freq
 const STROBESETTINGS * SetFrequency(MILLIHZ new) { return setNewFreq(new); }
 const STROBESETTINGS * AlterFrequency(MILLIHZ change) { return setNewFreq(s_settings.frequency + change); }
 
-const STROBESETTINGS * SetRPM(uint16_t new) { return setNewFreq(RPM_TO_MILLIHZ(new)); }
-const STROBESETTINGS * AlterRPM(int16_t change) { return setNewFreq(RPM_TO_MILLIHZ(s_settings.rpm + change)); }
+const STROBESETTINGS * SetRPM(uint16_t new) { return setNewRpm(new); }
+const STROBESETTINGS * AlterRPM(int16_t change) { return setNewRpm(s_settings.rpm + change); }
 
 /* SetDuty
  :If in range, immediately sets a new strobe duty cycle
@@ -91,6 +92,17 @@ static const STROBESETTINGS * setNewFreq(MILLIHZ freq)
 	{
 		s_settings.frequency = freq;
 		s_settings.rpm = MILLIHZ_TO_RPM(freq);
+	}
+	return (const STROBESETTINGS *)&s_settings;
+}
+
+static const STROBESETTINGS * setNewRpm(uint16_t rpm)
+{
+	if ((rpm <= MAX_RPM) && (rpm >= MIN_RPM))
+	{
+		s_settings.rpm = rpm;
+		s_settings.frequency = RPM_TO_MILLIHZ(rpm);
+		
 	}
 	return (const STROBESETTINGS *)&s_settings;
 }
