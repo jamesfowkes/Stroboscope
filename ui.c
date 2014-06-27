@@ -131,12 +131,12 @@ static BTN encButton =
 	.max_debounce_count = BUTTON_DEBOUNCE_COUNT
 };
 
-static SELECTEDLINE s_topLine = FREQ;
+static SELECTEDLINE s_topLine = RPM;
 static int8_t s_selectedDigit = 0;
 
 static uint8_t s_scanPeriodMs;
 
-static uint8_t s_maxDigits[] = {3, 3, 2}; // RPM, Freq, Duty
+static uint8_t s_maxDigits[] = {5, 5, 2}; // RPM, Freq, Duty
 
 static TMR8_TICK_CONFIG uiTick;
 
