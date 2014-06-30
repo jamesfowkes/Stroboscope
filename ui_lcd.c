@@ -88,21 +88,21 @@ static void updateDisplay(SELECTEDLINE line, uint8_t start, uint8_t length);
 */
 void UI_LCD_Init(void)
 {
-	lcdDataPorts.port0 = IO_GetReadPortDirect(IO_PORTB);
-	lcdDataPorts.port1 = IO_GetReadPortDirect(IO_PORTB);
-	lcdDataPorts.port2 = IO_GetReadPortDirect(IO_PORTB);
-	lcdDataPorts.port3 = IO_GetReadPortDirect(IO_PORTB);
-	lcdDataPorts.rsPort = IO_GetReadPortDirect(IO_PORTB);
-	lcdDataPorts.rwPort = IO_GetReadPortDirect(IO_PORTB);
-	lcdDataPorts.enPort = IO_GetReadPortDirect(IO_PORTB);
+	lcdDataPorts.port0 = IO_GetReadPortDirect(IO_PORTD);
+	lcdDataPorts.port1 = IO_GetReadPortDirect(IO_PORTD);
+	lcdDataPorts.port2 = IO_GetReadPortDirect(IO_PORTD);
+	lcdDataPorts.port3 = IO_GetReadPortDirect(IO_PORTD);
+	lcdDataPorts.rsPort = IO_GetReadPortDirect(IO_PORTD);
+	lcdDataPorts.rwPort = IO_GetReadPortDirect(IO_PORTD);
+	lcdDataPorts.enPort = IO_GetReadPortDirect(IO_PORTD);
 	
-	lcdDirectionPorts.port0 = IO_GetDirectionPortDirect(IO_PORTB);
-	lcdDirectionPorts.port1 = IO_GetDirectionPortDirect(IO_PORTB);
-	lcdDirectionPorts.port2 = IO_GetDirectionPortDirect(IO_PORTB);
-	lcdDirectionPorts.port3 = IO_GetDirectionPortDirect(IO_PORTB);
-	lcdDirectionPorts.rsPort = IO_GetDirectionPortDirect(IO_PORTB);
-	lcdDirectionPorts.rwPort = IO_GetDirectionPortDirect(IO_PORTB);
-	lcdDirectionPorts.enPort = IO_GetDirectionPortDirect(IO_PORTB);
+	lcdDirectionPorts.port0 = IO_GetDirectionPortDirect(IO_PORTD);
+	lcdDirectionPorts.port1 = IO_GetDirectionPortDirect(IO_PORTD);
+	lcdDirectionPorts.port2 = IO_GetDirectionPortDirect(IO_PORTD);
+	lcdDirectionPorts.port3 = IO_GetDirectionPortDirect(IO_PORTD);
+	lcdDirectionPorts.rsPort = IO_GetDirectionPortDirect(IO_PORTD);
+	lcdDirectionPorts.rwPort = IO_GetDirectionPortDirect(IO_PORTD);
+	lcdDirectionPorts.enPort = IO_GetDirectionPortDirect(IO_PORTD);
 	
 	lcdPins.pin0 = 0;
 	lcdPins.pin1 = 1;

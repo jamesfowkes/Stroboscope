@@ -214,13 +214,13 @@ static void handleEncoderChange(int16_t change)
 	switch (UI_SelectedLine())
 	{
 	case RPM:
-		s_settings = AlterRPM(change); // Each encoder tick is change of 1RPM
+		s_settings = AlterRPM(change); // Each encoder tick is change of 1RPM * multiplier
 		break;
 	case FREQ:
-		s_settings = AlterFrequency(change * 10); // Each encoder tick is change of 10mHz
+		s_settings = AlterFrequency(change * 10); // Each encoder tick is change of 10mHz * multiplier
 		break;
 	case DUTY:
-		s_settings = AlterDuty(change); // Each encoder tick is change of 1%
+		s_settings = AlterDuty(change); // Each encoder tick is change of 1% * multiplier
 		break;
 	}
 	

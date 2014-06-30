@@ -60,7 +60,6 @@
 
 #define IDLE_MS_COUNT (2000)
 
-// TODO: replace with actual ports/pins
 #define HALF_BUTTON_PORT IO_PORTB
 #define THIRD_BUTTON_PORT IO_PORTB
 #define DOUBLE_BUTTON_PORT IO_PORTB
@@ -166,8 +165,7 @@ bool UI_Init(uint8_t scanPeriodMs)
 	uiTick.active = true;
 	TMR8_Tick_AddTimerConfig(&uiTick);
 	
-	// TODO: Change to actual encoder inputs
-	ENC_Setup(IO_PORTB, 0, 1, 18, 19);
+	ENC_Setup(IO_PORTC, 0, 1, 8, 9);
 	
 	UI_LCD_Init();
 	
@@ -217,6 +215,32 @@ void UI_UpdateDisplay(uint16_t freq, uint16_t rpm, uint8_t duty)
 	UI_LCD_SetRPM(rpm);
 }
 
+#ifdef TEST_HARNESS
+void UI_PressButton(BUTTONS button, bool set)
+{
+
+	switch(button)
+	{
+	case HALF:
+		IO_SetInput(HALF_BUTTON_PORT, HALF_BUTTON_PIN, set ? IO_OFF : IO_ON);
+		break;
+	case DOUBLE:
+		IO_SetInput(DOUBLE_BUTTON_PORT, DOUBLE_BUTTON_PIN, set ? IO_OFF : IO_ON);
+		break;
+	case THIRD:
+		IO_SetInput(THIRD_BUTTON_PORT, THIRD_BUTTON_PIN, set ? IO_OFF : IO_ON);
+		break;
+	case TREBLE:
+		IO_SetInput(TREBLE_BUTTON_PORT, TREBLE_BUTTON_PIN, set ? IO_OFF : IO_ON);
+		break;
+	case ENC:
+		IO_SetInput(ENC_BUTTON_PORT, ENC_BUTTON_PIN, set ? IO_OFF : IO_ON);
+		break;
+	default:
+		break;
+	}
+}
+#endif
 /*
  * Private Functions
  */
