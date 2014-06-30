@@ -50,6 +50,10 @@
 DECLARE_TEST_FUNCS(ApplicationDefaultsAreSet);
 DECLARE_TEST_FUNCS(IncreaseEncoderByOneWithSwitchOpen);
 DECLARE_TEST_FUNCS(IncreaseEncoderByTenWithSwitchOpen);
+DECLARE_TEST_FUNCS(IncreaseEncoderByOneWithSwitchClosed);
+DECLARE_TEST_FUNCS(IncreaseEncoderByTenWithSwitchClosed);
+DECLARE_TEST_FUNCS(DecreaseEncoderByFourWithSwitchClosed);
+DECLARE_TEST_FUNCS(DecreaseEncoderBySevenWithSwitchOpen);
 
 /*
  * Local Test Variables
@@ -61,7 +65,11 @@ DECLARE_TEST_GROUP(ApplicationTests)
 {
 	TEST_STRUCT(ApplicationDefaultsAreSet),
 	TEST_STRUCT(IncreaseEncoderByOneWithSwitchOpen),
-	TEST_STRUCT(IncreaseEncoderByTenWithSwitchOpen)
+	TEST_STRUCT(IncreaseEncoderByTenWithSwitchOpen),
+	TEST_STRUCT(IncreaseEncoderByOneWithSwitchClosed),
+	TEST_STRUCT(IncreaseEncoderByTenWithSwitchClosed),
+	TEST_STRUCT(DecreaseEncoderByFourWithSwitchClosed),
+	TEST_STRUCT(DecreaseEncoderBySevenWithSwitchOpen)
 };
 END_TEST_GROUP(ApplicationTests);
 
@@ -71,7 +79,7 @@ END_TEST_GROUP(ApplicationTests);
 
 DECLARE_TEST_FUNC(ApplicationDefaultsAreSet)
 {
-	// Nothing to set up
+	PORTB = 0xFF; // Turn off all buttons to start with
 }
 
 DECLARE_RESULT_FUNC(ApplicationDefaultsAreSet)
@@ -83,11 +91,69 @@ DECLARE_RESULT_FUNC(ApplicationDefaultsAreSet)
 	TEST_ASSERT_EQUAL(GetRPM(), 1000 );
 }
 
+/* TEST 1 */
 DECLARE_TEST_FUNC(IncreaseEncoderByOneWithSwitchOpen) { ENC_SetMovement(1); }
 DECLARE_RESULT_FUNC(IncreaseEncoderByOneWithSwitchOpen) { TEST_ASSERT_EQUAL(GetRPM(), 1001 ); }
 
+/* TEST 2 */
 DECLARE_TEST_FUNC(IncreaseEncoderByTenWithSwitchOpen) {	ENC_SetMovement(10); }
 DECLARE_RESULT_FUNC(IncreaseEncoderByTenWithSwitchOpen) { TEST_ASSERT_EQUAL(GetRPM(), 1011 ); }
+
+/* TEST 3 */
+DECLARE_TEST_FUNC(IncreaseEncoderByOneWithSwitchClosed)
+{
+	PORTB &= ~(1 << 4); // Press the encoder button
+	ENC_SetMovement(1);
+}
+
+DECLARE_RESULT_FUNC(IncreaseEncoderByOneWithSwitchClosed)
+{
+	TEST_ASSERT_EQUAL(GetRPM(), 1011 ); // The RPM should not have changed
+	TEST_ASSERT_EQUAL(UI_SelectedDigit(), 1 );
+}
+
+/* TEST 4 */
+DECLARE_TEST_FUNC(IncreaseEncoderByTenWithSwitchClosed)
+{
+	ENC_SetMovement(10);
+}
+
+DECLARE_RESULT_FUNC(IncreaseEncoderByTenWithSwitchClosed)
+{
+	TEST_ASSERT_EQUAL(UI_SelectedLine(), DUTY );
+	TEST_ASSERT_EQUAL(UI_SelectedDigit(), 1 );
+}
+
+/* TEST 5 */
+DECLARE_TEST_FUNC(DecreaseEncoderByFourWithSwitchClosed)
+{
+	ENC_SetMovement(-4);
+}
+
+DECLARE_RESULT_FUNC(DecreaseEncoderByFourWithSwitchClosed)
+{
+	TEST_ASSERT_EQUAL(UI_SelectedLine(), FREQ );
+	TEST_ASSERT_EQUAL(UI_SelectedDigit(), 2 );
+}
+
+/* TEST 6 */
+DECLARE_TEST_FUNC(DecreaseEncoderBySevenWithSwitchOpen)
+{
+	PORTB |= (1 << 4); // Release the encoder button
+	ENC_SetMovement(-7);
+}
+
+DECLARE_RESULT_FUNC(DecreaseEncoderBySevenWithSwitchOpen)
+{
+	TEST_ASSERT_EQUAL(UI_SelectedLine(), FREQ );
+	TEST_ASSERT_EQUAL(UI_SelectedDigit(), 2 );
+	// 1011 RPM is 16.85Hz, which is 16850 mHz.
+	// The trailing zero is hidden by the display, so index '2'
+	// represents the '6' digit.
+	// After a change of -7 encoder ticks on the '6' digit,
+	// new value should be 9850
+	TEST_ASSERT_EQUAL(GetFrequency(), 9850 );
+}
 
 void DO_TEST_HARNESS_SETUP(void)
 {

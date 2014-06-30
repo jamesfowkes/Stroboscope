@@ -1,6 +1,6 @@
 NAME = stroboscope_test
 CC = gcc 
-FLAGS = -Wall -Wextra -lpthread -DTEST_HARNESS -DF_CPU=8000000 -DMEMORY_POOL_BYTES=512 -DENCODER_PCINT0 -std=c99  -Wfatal-errors
+FLAGS = -Wall -Wextra -lpthread -DTEST_HARNESS -DF_CPU=8000000 -DMEMORY_POOL_BYTES=512 -DENCODER_PCINT0 -DSUPPRESS_PCINT0 -std=c99  -Wfatal-errors
 MMCU = iom328p
 
 AVR_DIR = $(AVR32_HOME)\avr\include\avr
@@ -27,11 +27,13 @@ CFILES = \
 	ui.c \
 	ui_lcd.c \
 	$(HARNESS_ROOT_DIR)/lib_io_harness.c \
+	$(HARNESS_ROOT_DIR)/lib_pcint_harness.c \
 	$(HARNESS_ROOT_DIR)/lib_tmr8_tick_harness_functions.c \
 	$(HARNESS_ROOT_DIR)/lib_tmr16_harness_functions.c \
 	$(LIBS_DIR)/AVR/lib_clk.c \
 	$(LIBS_DIR)/AVR/lib_fuses.c \
 	$(LIBS_DIR)/AVR/lib_io.c \
+	$(LIBS_DIR)/AVR/lib_pcint.c \
 	$(LIBS_DIR)/AVR/lib_tmr8.c \
 	$(LIBS_DIR)/AVR/lib_tmr8_tick.c \
 	$(LIBS_DIR)/AVR/lib_encoder.c \
