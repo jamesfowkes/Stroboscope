@@ -51,8 +51,12 @@
  * Defines and Typedefs
  */
 
+#ifndef TEST_HARNESS
 #define BUTTON_DEBOUNCE_MS (100)
 #define BUTTON_DEBOUNCE_COUNT (BUTTON_DEBOUNCE_MS / BUTTON_SCAN_PERIOD_MS)
+#else
+#define BUTTON_DEBOUNCE_COUNT (1)
+#endif
 
 #define IDLE_MS_COUNT (2000)
 
@@ -72,7 +76,9 @@
 /*
  * Private Function Prototypes
  */
- 
+
+static void nextDigit(void);
+static void prevDigit(void);
 static void nextLine(void);
 static void prevLine(void);
 
@@ -136,7 +142,7 @@ static int8_t s_selectedDigit = 0;
 
 static uint8_t s_scanPeriodMs;
 
-static uint8_t s_maxDigits[] = {5, 5, 2}; // RPM, Freq, Duty
+static uint8_t s_maxDigitIdx[] = {4, 4, 2}; // RPM, Freq, Duty
 
 static TMR8_TICK_CONFIG uiTick;
 
@@ -161,7 +167,7 @@ bool UI_Init(uint8_t scanPeriodMs)
 	TMR8_Tick_AddTimerConfig(&uiTick);
 	
 	// TODO: Change to actual encoder inputs
-	ENC_Setup(IO_PORTB, 0, 1);
+	ENC_Setup(IO_PORTB, 0, 1, 18, 19);
 	
 	UI_LCD_Init();
 	
@@ -193,11 +199,15 @@ bool UI_EncoderButtonIsPressed(void) { return encButton.current_state == BTN_STA
 
 void UI_HandleEncoderChange(int16_t encoderChange)
 {
-	s_selectedDigit += encoderChange;
-	
 	// Wrap the selected digit inside limits for the current edit line
-	if (s_selectedDigit > s_maxDigits[s_topLine]) { nextLine(); }
-	if (s_selectedDigit < 0) { prevLine(); }
+	if (encoderChange > 0)
+	{
+		while (encoderChange-- > 0) { nextDigit(); }
+	}
+	else if (encoderChange < 0)
+	{
+		while (encoderChange++ < 0) { prevDigit(); }
+	}
 }
 
 void UI_UpdateDisplay(uint16_t freq, uint16_t rpm, uint8_t duty)
@@ -211,6 +221,18 @@ void UI_UpdateDisplay(uint16_t freq, uint16_t rpm, uint8_t duty)
  * Private Functions
  */
 
+static void nextDigit(void)
+{
+	incrementwithrollover(s_selectedDigit, s_maxDigitIdx[s_topLine]);
+	if (s_selectedDigit == 0 ) { nextLine(); } // Rollover to next line
+}
+
+static void prevDigit(void)
+{
+	decrementwithrollover(s_selectedDigit, s_maxDigitIdx[s_topLine]);
+	if (s_selectedDigit == s_maxDigitIdx[s_topLine]) { prevLine(); } // Rollunder to previous line
+}
+
 static void nextLine(void)
 {
 	incrementwithrollover(s_topLine, DUTY);
@@ -221,7 +243,7 @@ static void nextLine(void)
 static void prevLine(void)
 {
 	decrementwithrollover(s_topLine, DUTY);
-	s_selectedDigit = s_maxDigits[s_topLine];
+	s_selectedDigit = s_maxDigitIdx[s_topLine];
 	UI_LCD_SetTopLine(s_topLine);
 }
 

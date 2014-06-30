@@ -88,13 +88,13 @@ static void updateDisplay(SELECTEDLINE line, uint8_t start, uint8_t length);
 */
 void UI_LCD_Init(void)
 {
-	lcdDataPorts.port0 = IO_GetPortDirect(IO_PORTB);
-	lcdDataPorts.port1 = IO_GetPortDirect(IO_PORTB);
-	lcdDataPorts.port2 = IO_GetPortDirect(IO_PORTB);
-	lcdDataPorts.port3 = IO_GetPortDirect(IO_PORTB);
-	lcdDataPorts.rsPort = IO_GetPortDirect(IO_PORTB);
-	lcdDataPorts.rwPort = IO_GetPortDirect(IO_PORTB);
-	lcdDataPorts.enPort = IO_GetPortDirect(IO_PORTB);
+	lcdDataPorts.port0 = IO_GetReadPortDirect(IO_PORTB);
+	lcdDataPorts.port1 = IO_GetReadPortDirect(IO_PORTB);
+	lcdDataPorts.port2 = IO_GetReadPortDirect(IO_PORTB);
+	lcdDataPorts.port3 = IO_GetReadPortDirect(IO_PORTB);
+	lcdDataPorts.rsPort = IO_GetReadPortDirect(IO_PORTB);
+	lcdDataPorts.rwPort = IO_GetReadPortDirect(IO_PORTB);
+	lcdDataPorts.enPort = IO_GetReadPortDirect(IO_PORTB);
 	
 	lcdDirectionPorts.port0 = IO_GetDirectionPortDirect(IO_PORTB);
 	lcdDirectionPorts.port1 = IO_GetDirectionPortDirect(IO_PORTB);
