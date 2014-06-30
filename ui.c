@@ -67,10 +67,10 @@
 #define ENC_BUTTON_PORT IO_PORTB
 
 #define HALF_BUTTON_PIN 0
-#define THIRD_BUTTON_PIN 1
-#define DOUBLE_BUTTON_PIN 2
-#define TREBLE_BUTTON_PIN 3
-#define ENC_BUTTON_PIN 4
+#define THIRD_BUTTON_PIN 2
+#define DOUBLE_BUTTON_PIN 3
+#define TREBLE_BUTTON_PIN 4
+#define ENC_BUTTON_PIN 6
 
 /*
  * Private Function Prototypes

@@ -72,7 +72,10 @@
 
 #define APP_TICK_MS 10
 #define BLINK_TICK_MS 500
- 
+
+#define OUTPUT_COMPARE_1_PORT IO_PORTB
+#define OUTPUT_COMPARE_1_PIN 1
+
 /*
  * Function Prototypes
  */
@@ -152,8 +155,10 @@ void APP_TrebleFreq() { s_settings = TrebleFrequency(); s_bSettingsChanged = tru
 */
 static void setupIO(void)
 {
-	// TODO: Set output compare A to output 
-	IO_SetMode(IO_PORTB, 5, IO_MODE_OUTPUT);
+	// Heartbeat LED
+	IO_SetMode(IO_PORTB, 5, IO_MODE_OUTPUT); 
+	// Main strobe output
+	IO_SetMode(OUTPUT_COMPARE_1_PORT, OUTPUT_COMPARE_1_PIN, IO_MODE_OUTPUT);
 }
 
 static void setupTimer(void)
