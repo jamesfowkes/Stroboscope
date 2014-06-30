@@ -24,6 +24,7 @@ CFILES = \
 	$(LIBS_DIR)/AVR/lib_clk.c \
 	$(LIBS_DIR)/AVR/lib_fuses.c \
 	$(LIBS_DIR)/AVR/lib_io.c \
+	$(LIBS_DIR)/AVR/lib_pcint.c \
 	$(LIBS_DIR)/AVR/lib_tmr8.c \
 	$(LIBS_DIR)/AVR/lib_tmr8_tick.c \
 	$(LIBS_DIR)/AVR/lib_encoder.c \
@@ -41,6 +42,7 @@ OPTS = \
 	-DF_CPU=16000000 \
 	-DMEMORY_POOL_BYTES=512 \
 	-DENCODER_PCINT0 \
+	-DSUPPRESS_PCINT0 \
 	-std=c99
 	
 LDFLAGS =
