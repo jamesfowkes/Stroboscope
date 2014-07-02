@@ -186,7 +186,7 @@ static void setupTimer(void)
 static void applicationTick(void)
 {
 	int encoderChange = ENC_GetMovement();
-	
+
 	if (!UI_EncoderButtonIsPressed())
 	{
 		// Encoder is controlling rpm/frequency or duty
