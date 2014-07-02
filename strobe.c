@@ -101,7 +101,7 @@ static const STROBESETTINGS * setNewRpm(uint16_t rpm)
 	if ((rpm <= MAX_RPM) && (rpm >= MIN_RPM))
 	{
 		s_settings.rpm = rpm;
-		s_settings.frequency = RPM_TO_MILLIHZ(rpm);
+		s_settings.frequency = RPM_TO_MILLIHZ((MILLIHZ)rpm);
 		
 	}
 	return (const STROBESETTINGS *)&s_settings;

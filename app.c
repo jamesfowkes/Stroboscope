@@ -109,6 +109,7 @@ int main(void)
 	setupIO();
 	
 	UI_Init(APP_TICK_MS);
+	UI_UpdateDisplay((s_settings->frequency + 5U)/10U, s_settings->rpm, s_settings->duty);
 
 	/* All processing interrupt based from here*/
 
@@ -130,7 +131,7 @@ int main(void)
 
 		if (TMR8_Tick_TestAndClear(&heartbeatTick))
 		{
-			
+			IO_Control(IO_PORTB, 5, IO_TOGGLE);
 		}
 	}
 
@@ -200,7 +201,7 @@ static void applicationTick(void)
 	if (s_bSettingsChanged)
 	{
 		s_bSettingsChanged = false;
-		UI_UpdateDisplay((s_settings->frequency + 5) / 10, s_settings->duty, s_settings->rpm);
+		UI_UpdateDisplay((s_settings->frequency + 5U) / 10U, s_settings->rpm, s_settings->duty);
 		SetStrobe();
 	}
 }

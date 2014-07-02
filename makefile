@@ -1,7 +1,10 @@
 NAME=stroboscope
 
 CC=avr-gcc
+
 MCU_TARGET=atmega328p
+AVRDUDE_PART=m328p
+
 LIBS_DIR = $(PROJECTS_PATH)/Libs
 
 DEL = python $(LIBS_DIR)/del.py
@@ -56,6 +59,10 @@ $(NAME).elf: $(OBJDEPS)
 
 %.o:%.c
 	$(CC) $(INCLUDE_DIRS) $(OPTS) -O$(OPT_LEVEL) -mmcu=$(MCU_TARGET) -c $< -o $@
+
+upload:
+	avr-objcopy -R .eeprom -O ihex $(NAME).elf  $(NAME).hex
+	avrdude -p$(AVRDUDE_PART) -P$(COMPORT) -carduino -b57600 -Uflash:w:$(NAME).hex:a
 
 clean:
 	$(DEL) $(NAME).elf

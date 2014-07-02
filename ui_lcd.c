@@ -77,6 +77,7 @@ static LCD_CONFIG lcdConfig;
  * Private Function Declarations
  */
 
+static void clearValue(SELECTEDLINE line, uint8_t start, uint8_t len);
 static void updateDisplay(SELECTEDLINE line, uint8_t start, uint8_t length);
 
 /*
@@ -88,29 +89,33 @@ static void updateDisplay(SELECTEDLINE line, uint8_t start, uint8_t length);
 */
 void UI_LCD_Init(void)
 {
-	lcdDataPorts.port0 = IO_GetReadPortDirect(IO_PORTD);
-	lcdDataPorts.port1 = IO_GetReadPortDirect(IO_PORTD);
-	lcdDataPorts.port2 = IO_GetReadPortDirect(IO_PORTD);
-	lcdDataPorts.port3 = IO_GetReadPortDirect(IO_PORTD);
-	lcdDataPorts.rsPort = IO_GetReadPortDirect(IO_PORTD);
-	lcdDataPorts.rwPort = IO_GetReadPortDirect(IO_PORTD);
-	lcdDataPorts.enPort = IO_GetReadPortDirect(IO_PORTD);
-	
-	lcdDirectionPorts.port0 = IO_GetDirectionPortDirect(IO_PORTD);
-	lcdDirectionPorts.port1 = IO_GetDirectionPortDirect(IO_PORTD);
-	lcdDirectionPorts.port2 = IO_GetDirectionPortDirect(IO_PORTD);
-	lcdDirectionPorts.port3 = IO_GetDirectionPortDirect(IO_PORTD);
-	lcdDirectionPorts.rsPort = IO_GetDirectionPortDirect(IO_PORTD);
-	lcdDirectionPorts.rwPort = IO_GetDirectionPortDirect(IO_PORTD);
-	lcdDirectionPorts.enPort = IO_GetDirectionPortDirect(IO_PORTD);
-	
-	lcdPins.pin0 = 0;
-	lcdPins.pin1 = 1;
-	lcdPins.pin2 = 2;
-	lcdPins.pin3 = 3;
-	lcdPins.rsPin = 4;
-	lcdPins.rwPin = 5;
-	lcdPins.enPin = 6;
+	lcdDataPorts.port0.r = IO_GetReadPortDirect(IO_PORTD);
+	lcdDataPorts.port1.r = IO_GetReadPortDirect(IO_PORTD);
+	lcdDataPorts.port2.r = IO_GetReadPortDirect(IO_PORTD);
+	lcdDataPorts.port3.r = IO_GetReadPortDirect(IO_PORTD);
+	lcdDataPorts.port0.w = IO_GetWritePortDirect(IO_PORTD);
+	lcdDataPorts.port1.w = IO_GetWritePortDirect(IO_PORTD);
+	lcdDataPorts.port2.w = IO_GetWritePortDirect(IO_PORTD);
+	lcdDataPorts.port3.w = IO_GetWritePortDirect(IO_PORTD);
+	lcdDirectionPorts.port0.w = IO_GetDirectionPortDirect(IO_PORTD);
+	lcdDirectionPorts.port1.w = IO_GetDirectionPortDirect(IO_PORTD);
+	lcdDirectionPorts.port2.w = IO_GetDirectionPortDirect(IO_PORTD);
+	lcdDirectionPorts.port3.w = IO_GetDirectionPortDirect(IO_PORTD);
+
+	lcdDirectionPorts.rsPort = IO_GetDirectionPortDirect(IO_PORTB);
+	lcdDirectionPorts.rwPort = IO_GetDirectionPortDirect(IO_PORTB);
+	lcdDirectionPorts.enPort = IO_GetDirectionPortDirect(IO_PORTB);
+	lcdDataPorts.rsPort = IO_GetWritePortDirect(IO_PORTB);
+	lcdDataPorts.rwPort = IO_GetWritePortDirect(IO_PORTB);
+	lcdDataPorts.enPort = IO_GetWritePortDirect(IO_PORTB);
+
+	lcdPins.pin0 = 2;
+	lcdPins.pin1 = 3;
+	lcdPins.pin2 = 4;
+	lcdPins.pin3 = 5;
+	lcdPins.rsPin = 0;
+	lcdPins.rwPin = 2;
+	lcdPins.enPin = 3;
 	
 	lcdConfig.type = LCD_CONTROLLER_HD44780;
 	lcdConfig.lines = 2;
@@ -148,6 +153,8 @@ void UI_LCD_SetRPM(uint16_t rpm)
 	// Get a pointer into the RPM string at the right point
 	char * chars = &rpmLine[RPM_VALUE_START_CHAR];
 	
+	clearValue(RPM, RPM_VALUE_START_CHAR, RPM_VALUE_LENGTH);
+
 	// In order to right align, temporarily null-terminate the string (wiping out 'r' char)
 	rpmLine[RPM_VALUE_START_CHAR + RPM_VALUE_LENGTH] = '\0';
 	
@@ -164,6 +171,8 @@ void UI_LCD_SetFrequency(uint16_t freq)
 	// Get a pointer into the freq string at the right point
 	char * chars = &freqLine[FREQ_VALUE_START_CHAR];
 	
+	clearValue(FREQ, FREQ_VALUE_START_CHAR, FREQ_VALUE_LENGTH);
+
 	// In order to right align, temporarily null-terminate the string (wiping out 'H' char)
 	freqLine[FREQ_VALUE_START_CHAR + FREQ_VALUE_LENGTH] = '\0';
 	
@@ -186,6 +195,8 @@ void UI_LCD_SetDuty(uint8_t duty)
 	// Get a pointer into the duty string at the right point
 	char * chars = &freqLine[DUTY_VALUE_START_CHAR];
 	
+	clearValue(DUTY, DUTY_VALUE_START_CHAR, DUTY_VALUE_LENGTH);
+
 	// In order to right align, temporarily null-terminate the string (wiping out '%' char)
 	dutyLine[DUTY_VALUE_START_CHAR + DUTY_VALUE_LENGTH] = '\0';
 	
@@ -201,6 +212,14 @@ void UI_LCD_SetDuty(uint8_t duty)
  * Private Function Definitions
  */
 
+static void clearValue(SELECTEDLINE line, uint8_t start, uint8_t len)
+{
+	for(uint8_t i = start; i < start + len; ++i)
+	{
+		lines[line][i] = ' ';
+	}
+}
+
 static void updateDisplay(SELECTEDLINE line, uint8_t start, uint8_t length)
 {
 	SELECTEDLINE topLine = UI_SelectedLine();
@@ -212,7 +231,7 @@ static void updateDisplay(SELECTEDLINE line, uint8_t start, uint8_t length)
 	
 	if (updateNow)
 	{
-		lcd_gotoxy(topLine == line ? 0 : 1, start); 
-		lcd_putsn(&rpmLine[start], length);
+		lcd_gotoxy(start, topLine == line ? 0 : 1); 
+		lcd_putsn(&lines[line][start], length);
 	}
 }
