@@ -161,6 +161,12 @@ bool UI_Init(uint8_t scanPeriodMs)
 	success &= BTN_InitHandler(&trebleButton);
 	success &= BTN_InitHandler(&encButton);
 	
+	IO_SetMode(HALF_BUTTON_PORT, HALF_BUTTON_PIN, IO_MODE_PULLUPINPUT);
+	IO_SetMode(THIRD_BUTTON_PORT, THIRD_BUTTON_PIN, IO_MODE_PULLUPINPUT);
+	IO_SetMode(DOUBLE_BUTTON_PORT, DOUBLE_BUTTON_PIN, IO_MODE_PULLUPINPUT);
+	IO_SetMode(TREBLE_BUTTON_PORT, TREBLE_BUTTON_PIN, IO_MODE_PULLUPINPUT);
+	IO_SetMode(ENC_BUTTON_PORT, ENC_BUTTON_PIN, IO_MODE_PULLUPINPUT);
+	
 	uiTick.reload = scanPeriodMs;
 	uiTick.active = true;
 	TMR8_Tick_AddTimerConfig(&uiTick);
@@ -249,12 +255,14 @@ static void nextDigit(void)
 {
 	incrementwithrollover(s_selectedDigit, s_maxDigitIdx[s_topLine]);
 	if (s_selectedDigit == 0 ) { nextLine(); } // Rollover to next line
+	UI_LCD_UpdateCursor();
 }
 
 static void prevDigit(void)
 {
 	decrementwithrollover(s_selectedDigit, s_maxDigitIdx[s_topLine]);
 	if (s_selectedDigit == s_maxDigitIdx[s_topLine]) { prevLine(); } // Rollunder to previous line
+	UI_LCD_UpdateCursor();
 }
 
 static void nextLine(void)

@@ -9,4 +9,6 @@ void UI_LCD_SetRPM(uint16_t freq);
 void UI_LCD_SetFrequency(uint16_t freq);
 void UI_LCD_SetDuty(uint8_t duty);
 
+void UI_LCD_UpdateCursor(void);
+
 #endif

@@ -185,7 +185,7 @@ static void setupTimer(void)
 */
 static void applicationTick(void)
 {
-	int encoderChange = ENC_GetMovement();
+	int encoderChange = ENC_GetMovement() / 2;
 
 	if (!UI_EncoderButtonIsPressed())
 	{

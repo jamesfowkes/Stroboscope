@@ -127,7 +127,7 @@ void UI_LCD_Init(void)
 	lcdConfig.line4Start = 0x54;
 	lcdConfig.wrapLines = false;
 
-	lcd_init(LCD_DISP_ON, &lcdDataPorts, &lcdDirectionPorts, &lcdPins, &lcdConfig);
+	lcd_init(LCD_DISP_ON_CURSOR_BLINK, &lcdDataPorts, &lcdDirectionPorts, &lcdPins, &lcdConfig);
 	
 	lcd_gotoxy(0,0);
 	lcd_puts(lines[0]);
@@ -146,6 +146,8 @@ void UI_LCD_SetTopLine(SELECTEDLINE line)
 	lcd_gotoxy(0,1);
 	incrementwithrollover(line, DUTY);
 	lcd_puts(lines[line]);
+
+	UI_LCD_UpdateCursor();
 }
 
 void UI_LCD_SetRPM(uint16_t rpm)
@@ -193,7 +195,7 @@ void UI_LCD_SetFrequency(uint16_t freq)
 void UI_LCD_SetDuty(uint8_t duty)
 {
 	// Get a pointer into the duty string at the right point
-	char * chars = &freqLine[DUTY_VALUE_START_CHAR];
+	char * chars = &dutyLine[DUTY_VALUE_START_CHAR];
 	
 	clearValue(DUTY, DUTY_VALUE_START_CHAR, DUTY_VALUE_LENGTH);
 
@@ -207,6 +209,25 @@ void UI_LCD_SetDuty(uint8_t duty)
 	
 	updateDisplay(DUTY, DUTY_VALUE_START_CHAR, DUTY_VALUE_LENGTH);
 }
+
+void UI_LCD_UpdateCursor(void)
+{
+	int8_t selectedDigit = UI_SelectedDigit();
+	switch(UI_SelectedLine())
+	{
+	case RPM:
+		selectedDigit = RPM_VALUE_START_CHAR + RPM_VALUE_LENGTH - selectedDigit - 1;
+		break;
+	case FREQ:
+		if (selectedDigit == 2) {selectedDigit = 3;} // Skip over D.P.
+		selectedDigit = FREQ_VALUE_START_CHAR + FREQ_VALUE_LENGTH - selectedDigit - 1;
+		break;
+	case DUTY:
+		selectedDigit = DUTY_VALUE_START_CHAR + DUTY_VALUE_LENGTH - selectedDigit - 1;
+		break;
+	}
+	lcd_gotoxy(selectedDigit, 0);
+}	
 
 /*
  * Private Function Definitions
@@ -233,5 +254,6 @@ static void updateDisplay(SELECTEDLINE line, uint8_t start, uint8_t length)
 	{
 		lcd_gotoxy(start, topLine == line ? 0 : 1); 
 		lcd_putsn(&lines[line][start], length);
+		UI_LCD_UpdateCursor();
 	}
 }
