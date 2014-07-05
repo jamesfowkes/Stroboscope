@@ -70,7 +70,7 @@
  * Private Defines and Datatypes
  */
 
-#define APP_TICK_MS 10
+#define APP_TICK_MS 100
 #define BLINK_TICK_MS 500
 
 #define OUTPUT_COMPARE_1_PORT IO_PORTB
@@ -108,8 +108,7 @@ int main(void)
 	setupTimer();
 	setupIO();
 	
-	UI_Init(APP_TICK_MS);
-	UI_UpdateDisplay((s_settings->frequency + 5U)/10U, s_settings->rpm, s_settings->duty);
+	UI_Init();
 
 	/* All processing interrupt based from here*/
 
@@ -117,6 +116,10 @@ int main(void)
 	
 	sei();
 
+	// Update display on first application tick
+	s_settings = Strobe_Init();
+	s_bSettingsChanged = true;
+	
 	while (true)
 	{
 		DO_TEST_HARNESS_RUNNING();
@@ -185,19 +188,22 @@ static void setupTimer(void)
 */
 static void applicationTick(void)
 {
-	int encoderChange = ENC_GetMovement() / 2;
+	int encoderChange = ENC_GetMovement();
 
-	if (!UI_EncoderButtonIsPressed())
+	if (encoderChange)
 	{
-		// Encoder is controlling rpm/frequency or duty
-		handleEncoderChange(encoderChange);
+		if (!UI_EncoderButtonIsPressed())
+		{
+			// Encoder is controlling rpm/frequency or duty
+			handleEncoderChange(encoderChange);
+		}
+		else
+		{
+			// Encoder is moving cursor on display
+			UI_HandleEncoderChange(encoderChange);
+		}
 	}
-	else
-	{
-		// Encoder is moving cursor on display
-		UI_HandleEncoderChange(encoderChange);
-	}
-	
+
 	if (s_bSettingsChanged)
 	{
 		s_bSettingsChanged = false;
@@ -213,7 +219,7 @@ static void applicationTick(void)
 */
 static void handleEncoderChange(int16_t change)
 {
-	uint16_t multipliers[] = {1, 10, 100, 1000};
+	uint16_t multipliers[] = {1, 10, 100, 1000, 10000};
 	
 	change *= multipliers[ UI_SelectedDigit() ];
 	

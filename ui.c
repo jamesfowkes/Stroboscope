@@ -52,25 +52,26 @@
  */
 
 #ifndef TEST_HARNESS
-#define BUTTON_DEBOUNCE_MS (100)
+#define BUTTON_DEBOUNCE_MS (40)
 #define BUTTON_DEBOUNCE_COUNT (BUTTON_DEBOUNCE_MS / BUTTON_SCAN_PERIOD_MS)
+#define BUTTON_SCAN_MS (10)
 #else
 #define BUTTON_DEBOUNCE_COUNT (1)
 #endif
 
 #define IDLE_MS_COUNT (2000)
 
-#define HALF_BUTTON_PORT IO_PORTB
-#define THIRD_BUTTON_PORT IO_PORTB
-#define DOUBLE_BUTTON_PORT IO_PORTB
-#define TREBLE_BUTTON_PORT IO_PORTB
-#define ENC_BUTTON_PORT IO_PORTB
+#define HALF_BUTTON_PORT IO_PORTC
+#define THIRD_BUTTON_PORT IO_PORTC
+#define DOUBLE_BUTTON_PORT IO_PORTC
+#define TREBLE_BUTTON_PORT IO_PORTC
+#define ENC_BUTTON_PORT IO_PORTD
 
-#define HALF_BUTTON_PIN 0
-#define THIRD_BUTTON_PIN 2
-#define DOUBLE_BUTTON_PIN 3
-#define TREBLE_BUTTON_PIN 4
-#define ENC_BUTTON_PIN 6
+#define HALF_BUTTON_PIN 2
+#define THIRD_BUTTON_PIN 3
+#define DOUBLE_BUTTON_PIN 4
+#define TREBLE_BUTTON_PIN 5
+#define ENC_BUTTON_PIN 7
 
 /*
  * Private Function Prototypes
@@ -139,8 +140,6 @@ static BTN encButton =
 static SELECTEDLINE s_topLine = RPM;
 static int8_t s_selectedDigit = 0;
 
-static uint8_t s_scanPeriodMs;
-
 static uint8_t s_maxDigitIdx[] = {4, 4, 2}; // RPM, Freq, Duty
 
 static TMR8_TICK_CONFIG uiTick;
@@ -149,11 +148,9 @@ static TMR8_TICK_CONFIG uiTick;
  * Public Functions
  */
  
-bool UI_Init(uint8_t scanPeriodMs)
+bool UI_Init(void)
 {
 	bool success = true;
-	
-	s_scanPeriodMs = scanPeriodMs;
 	
 	success &= BTN_InitHandler(&halfButton);
 	success &= BTN_InitHandler(&thirdButton);
@@ -167,11 +164,11 @@ bool UI_Init(uint8_t scanPeriodMs)
 	IO_SetMode(TREBLE_BUTTON_PORT, TREBLE_BUTTON_PIN, IO_MODE_PULLUPINPUT);
 	IO_SetMode(ENC_BUTTON_PORT, ENC_BUTTON_PIN, IO_MODE_PULLUPINPUT);
 	
-	uiTick.reload = scanPeriodMs;
+	uiTick.reload = BUTTON_SCAN_MS;
 	uiTick.active = true;
 	TMR8_Tick_AddTimerConfig(&uiTick);
 	
-	ENC_Setup(IO_PORTC, 0, 1, 8, 9);
+	ENC_Setup(IO_PORTC, 0, 1, 8, 9, 4);
 	
 	UI_LCD_Init();
 	
@@ -206,11 +203,11 @@ void UI_HandleEncoderChange(int16_t encoderChange)
 	// Wrap the selected digit inside limits for the current edit line
 	if (encoderChange > 0)
 	{
-		while (encoderChange-- > 0) { nextDigit(); }
+		nextDigit();
 	}
 	else if (encoderChange < 0)
 	{
-		while (encoderChange++ < 0) { prevDigit(); }
+		prevDigit();
 	}
 }
 

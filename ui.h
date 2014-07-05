@@ -27,7 +27,7 @@ typedef enum buttons BUTTONS;
  * Public Function Prototypes
  */
 
-bool UI_Init(uint8_t scanPeriodMs);
+bool UI_Init(void);
 void UI_Tick(void);
 
 SELECTEDLINE UI_SelectedLine(void);

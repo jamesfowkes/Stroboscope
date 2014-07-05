@@ -24,8 +24,11 @@
  * Local Variables
  */
  
-// Start at default frequency, 50% duty
-STROBESETTINGS s_settings = {DEFAULT_FREQ, DEFAULT_RPM, 50U};
+
+STROBESETTINGS s_settings;
+
+static MILLIHZ s_maxFreq = 0U;
+static uint16_t s_minRPM = 0U;
 
 /*
  * Private Function Declarations
@@ -34,9 +37,27 @@ STROBESETTINGS s_settings = {DEFAULT_FREQ, DEFAULT_RPM, 50U};
 static const STROBESETTINGS * setNewFreq(MILLIHZ freq);
 static const STROBESETTINGS * setNewRpm(uint16_t rpm);
 
+static MILLIHZ rpmToMilliHz(uint16_t rpm);
+static uint16_t milliHzToRpm(MILLIHZ freq);
+
 /*
  * Public Function Definitions
  */
+
+/* Init
+ :Set defaults
+ */
+const STROBESETTINGS * Strobe_Init(void)
+{
+	s_settings.frequency = rpmToMilliHz(DEFAULT_RPM);
+	s_settings.rpm = DEFAULT_RPM;
+	s_settings.duty = 50U;
+
+	s_maxFreq = rpmToMilliHz(MAX_RPM);
+	s_minRPM = milliHzToRpm(MIN_FREQ);
+
+	return &s_settings;
+}
 
 /* GetDuty, GetFrequency, GetRPM
  :Accessor functions for current duty, frequency and RPM
@@ -57,7 +78,13 @@ const STROBESETTINGS * DoubleFrequency(void) { return setNewFreq(s_settings.freq
 const STROBESETTINGS * TrebleFrequency(void) { return setNewFreq(s_settings.frequency * 3); }
 
 const STROBESETTINGS * SetFrequency(MILLIHZ new) { return setNewFreq(new); }
-const STROBESETTINGS * AlterFrequency(MILLIHZ change) { return setNewFreq(s_settings.frequency + change); }
+const STROBESETTINGS * AlterFrequency(int16_t change)
+{
+	int32_t newFrequency = s_settings.frequency + change;
+	newFrequency = min(newFrequency, (int32_t)s_maxFreq);
+	newFrequency = max(newFrequency, MIN_FREQ);
+	return setNewFreq((MILLIHZ)newFrequency);
+}
 
 const STROBESETTINGS * SetRPM(uint16_t new) { return setNewRpm(new); }
 const STROBESETTINGS * AlterRPM(int16_t change) { return setNewRpm(s_settings.rpm + change); }
@@ -67,7 +94,18 @@ const STROBESETTINGS * AlterRPM(int16_t change) { return setNewRpm(s_settings.rp
 */
 const STROBESETTINGS * SetDuty(uint8_t duty)
 {
-	if ((duty <= 100) && (duty > 0)) { s_settings.duty = duty; }
+	if ((duty <= 100) && (duty > 0))
+	{
+		s_settings.duty = duty;
+	}
+	else if (duty > 100)
+	{
+		s_settings.duty = 100;
+	}
+	else if (duty == 0)
+	{
+		s_settings.duty = 1;
+	}
 	return &s_settings;
 }
 
@@ -76,7 +114,10 @@ const STROBESETTINGS * SetDuty(uint8_t duty)
 */
 const STROBESETTINGS * AlterDuty(int16_t duty)
 {
-	return SetDuty(s_settings.duty + duty);
+	int16_t newDuty = (int16_t)s_settings.duty + duty;
+	newDuty = min(newDuty, 100);
+	newDuty = max(newDuty, 1);
+	return SetDuty((uint8_t)newDuty);
 }
 
 /*
@@ -88,21 +129,48 @@ const STROBESETTINGS * AlterDuty(int16_t duty)
 */
 static const STROBESETTINGS * setNewFreq(MILLIHZ freq)
 {
-	if ((freq <= MAX_FREQ) && (freq >= MIN_FREQ))
+	if ((freq <= s_maxFreq) && (freq >= MIN_FREQ))
 	{
 		s_settings.frequency = freq;
-		s_settings.rpm = MILLIHZ_TO_RPM(freq);
+		s_settings.rpm = milliHzToRpm(freq);
 	}
 	return (const STROBESETTINGS *)&s_settings;
 }
 
 static const STROBESETTINGS * setNewRpm(uint16_t rpm)
 {
-	if ((rpm <= MAX_RPM) && (rpm >= MIN_RPM))
+	if ((rpm <= MAX_RPM) && (rpm >= s_minRPM))
 	{
 		s_settings.rpm = rpm;
-		s_settings.frequency = RPM_TO_MILLIHZ((MILLIHZ)rpm);
-		
+		s_settings.frequency = rpmToMilliHz((MILLIHZ)rpm);
 	}
+	else if (rpm > MAX_RPM)
+	{
+		s_settings.rpm = MAX_RPM;
+		s_settings.frequency = rpmToMilliHz((MILLIHZ)MAX_RPM);
+	}
+	else if (rpm < s_minRPM)
+	{
+		s_settings.rpm = s_minRPM;
+		s_settings.frequency = rpmToMilliHz((MILLIHZ)s_minRPM);
+	}
+
 	return (const STROBESETTINGS *)&s_settings;
 }
+
+static MILLIHZ rpmToMilliHz(uint16_t rpm)
+{
+	MILLIHZ mHz = (MILLIHZ)(rpm);
+	mHz *= 1000U;
+	mHz= div_round_pos(mHz, 60U);
+	return mHz;
+}
+
+static uint16_t milliHzToRpm(MILLIHZ freq)
+{
+	uint32_t rpm = freq * 60U;
+	rpm = div_round_pos(rpm, 1000U);
+	return (uint16_t)rpm;
+}
+
+

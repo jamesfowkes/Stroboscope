@@ -5,19 +5,13 @@
  * Defines and Typedefs
  */
 
-#define MILLIHZ_TO_RPM(f) ((((f) * 60U) + 500U) / 1000U)
-#define RPM_TO_MILLIHZ(rpm) ((((rpm) * 1000U) + 30U) / 60U)
-
 // Top of range is defined by max rpm
 #define MAX_RPM (10000U)
-#define MAX_FREQ RPM_TO_MILLIHZ(MAX_RPM)
 
 // Bottom of range is defined by min frequency
 #define MIN_FREQ (2000U)
-#define MIN_RPM MILLIHZ_TO_RPM(MIN_FREQ)
 
 #define DEFAULT_RPM (1000U)
-#define DEFAULT_FREQ  RPM_TO_MILLIHZ(DEFAULT_RPM)
 
 struct strobesettings
 {
@@ -31,6 +25,8 @@ typedef struct strobesettings STROBESETTINGS;
  * Public Function Declarations
  */
 
+const STROBESETTINGS * Strobe_Init(void);
+
 uint8_t GetDuty(void);
 MILLIHZ GetFrequency(void);
 uint16_t GetRPM(void);
@@ -43,7 +39,7 @@ const STROBESETTINGS * DoubleFrequency(void);
 const STROBESETTINGS * TrebleFrequency(void);
 
 const STROBESETTINGS * SetFrequency(MILLIHZ freq);
-const STROBESETTINGS * AlterFrequency(MILLIHZ change);
+const STROBESETTINGS * AlterFrequency(int16_t change);
 
 const STROBESETTINGS * SetRPM(uint16_t rpm);
 const STROBESETTINGS * AlterRPM(int16_t change);
