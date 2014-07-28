@@ -7,3 +7,4 @@ error.txt
 
 #LUFA Library
 LUFA/*
+compiletime.h
