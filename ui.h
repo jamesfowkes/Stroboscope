@@ -22,7 +22,7 @@ enum buttons
 	ENC
 };
 typedef enum buttons BUTTONS;
-	
+
 /*
  * Public Function Prototypes
  */

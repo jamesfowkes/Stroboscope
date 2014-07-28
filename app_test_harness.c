@@ -71,9 +71,9 @@ DECLARE_TEST_GROUP(ApplicationTests)
 	TEST_STRUCT(IncreaseEncoderByOneWithSwitchOpen),
 	TEST_STRUCT(IncreaseEncoderByTenWithSwitchOpen),
 	TEST_STRUCT(IncreaseEncoderByOneWithSwitchClosed),
-	TEST_STRUCT(IncreaseEncoderByTenWithSwitchClosed),
-	TEST_STRUCT(DecreaseEncoderByFourWithSwitchClosed),
-	TEST_STRUCT(DecreaseEncoderBySevenWithSwitchOpen),
+	TEST_STRUCT_N(IncreaseEncoderByTenWithSwitchClosed, 10),
+	TEST_STRUCT_N(DecreaseEncoderByFourWithSwitchClosed, 4),
+	TEST_STRUCT_N(DecreaseEncoderBySevenWithSwitchOpen, 7),
 	TEST_STRUCT(PressHalfButton),
 	TEST_STRUCT(PressDoubleButton),
 	TEST_STRUCT(PressThirdButton),
@@ -99,7 +99,7 @@ DECLARE_RESULT_FUNC(ApplicationDefaultsAreSet)
 	TEST_ASSERT_EQUAL(UI_SelectedLine(), RPM );
 	TEST_ASSERT_EQUAL(UI_SelectedDigit(), 0 );
 	TEST_ASSERT_EQUAL(GetDuty(), 50);
-	TEST_ASSERT_EQUAL(GetFrequency(), 16667 );
+	TEST_ASSERT_EQUAL(GetFrequency(), 16668 );
 	TEST_ASSERT_EQUAL(GetRPM(), 1000 );
 }
 
@@ -132,7 +132,7 @@ DECLARE_RESULT_FUNC(IncreaseEncoderByOneWithSwitchClosed)
 /* TEST 4 */
 DECLARE_TEST_FUNC(IncreaseEncoderByTenWithSwitchClosed)
 {
-	ENC_SetMovement(10);
+	ENC_SetMovement(1);
 }
 
 DECLARE_RESULT_FUNC(IncreaseEncoderByTenWithSwitchClosed)
@@ -144,7 +144,7 @@ DECLARE_RESULT_FUNC(IncreaseEncoderByTenWithSwitchClosed)
 /* TEST 5 */
 DECLARE_TEST_FUNC(DecreaseEncoderByFourWithSwitchClosed)
 {
-	ENC_SetMovement(-4);
+	ENC_SetMovement(-1);
 }
 
 DECLARE_RESULT_FUNC(DecreaseEncoderByFourWithSwitchClosed)
@@ -157,7 +157,7 @@ DECLARE_RESULT_FUNC(DecreaseEncoderByFourWithSwitchClosed)
 DECLARE_TEST_FUNC(DecreaseEncoderBySevenWithSwitchOpen)
 {
 	UI_PressButton(ENC, false);
-	ENC_SetMovement(-7);
+	ENC_SetMovement(-1);
 }
 
 DECLARE_RESULT_FUNC(DecreaseEncoderBySevenWithSwitchOpen)

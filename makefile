@@ -30,5 +30,5 @@ EXTRA_FLAGS = \
 	-DENCODER_PCINT1 \
 	-DSUPPRESS_PCINT1
 	
-include $(PROJECTS_PATH)/make_avr.mk
+include $(LIBS_DIR)/AVR/make_avr.mk
 

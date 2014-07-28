@@ -9,7 +9,7 @@
 #define MAX_RPM (10000U)
 
 // Bottom of range is defined by min frequency
-#define MIN_FREQ (2000U)
+#define MIN_FREQ (MILLIHZ)(2000)
 
 #define DEFAULT_RPM (1000U)
 

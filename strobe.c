@@ -80,10 +80,10 @@ const STROBESETTINGS * TrebleFrequency(void) { return setNewFreq(s_settings.freq
 const STROBESETTINGS * SetFrequency(MILLIHZ new) { return setNewFreq(new); }
 const STROBESETTINGS * AlterFrequency(int16_t change)
 {
-	int32_t newFrequency = s_settings.frequency + change;
-	newFrequency = min(newFrequency, (int32_t)s_maxFreq);
+	MILLIHZ newFrequency = s_settings.frequency + change;
+	newFrequency = min(newFrequency, s_maxFreq);
 	newFrequency = max(newFrequency, MIN_FREQ);
-	return setNewFreq((MILLIHZ)newFrequency);
+	return setNewFreq(newFrequency);
 }
 
 const STROBESETTINGS * SetRPM(uint16_t new) { return setNewRpm(new); }

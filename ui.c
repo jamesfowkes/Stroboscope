@@ -54,7 +54,6 @@
 #ifndef TEST_HARNESS
 #define BUTTON_DEBOUNCE_MS (40)
 #define BUTTON_DEBOUNCE_COUNT (BUTTON_DEBOUNCE_MS / BUTTON_SCAN_PERIOD_MS)
-#define BUTTON_SCAN_MS (10)
 #else
 #define BUTTON_DEBOUNCE_COUNT (1)
 #endif
@@ -164,7 +163,7 @@ bool UI_Init(void)
 	IO_SetMode(TREBLE_BUTTON_PORT, TREBLE_BUTTON_PIN, IO_MODE_PULLUPINPUT);
 	IO_SetMode(ENC_BUTTON_PORT, ENC_BUTTON_PIN, IO_MODE_PULLUPINPUT);
 	
-	uiTick.reload = BUTTON_SCAN_MS;
+	uiTick.reload = BUTTON_SCAN_PERIOD_MS;
 	uiTick.active = true;
 	TMR8_Tick_AddTimerConfig(&uiTick);
 	
